@@ -33,6 +33,9 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  experimental: {
+    optimizePackageImports: ["drizzle-orm", "zod", "bcryptjs"],
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

@@ -3,16 +3,16 @@ import type { ReactNode } from "react";
 type Tone = "neutral" | "success" | "warning" | "danger" | "info";
 
 const TONES: Record<Tone, string> = {
-  neutral: "bg-slate-100 text-slate-700 ring-slate-200",
-  success: "bg-emerald-50 text-emerald-800 ring-emerald-200",
-  warning: "bg-amber-50 text-amber-800 ring-amber-200",
-  danger: "bg-rose-50 text-rose-800 ring-rose-200",
-  info: "bg-sky-50 text-sky-800 ring-sky-200",
+  neutral: "badge-default",
+  success: "badge-success",
+  warning: "badge-warning",
+  danger: "badge-destructive",
+  info: "badge-info",
 };
 
-export function Badge({ tone = "neutral", children }: { tone?: Tone; children: ReactNode }) {
+export function Badge({ tone = "neutral", children, className = "" }: { tone?: Tone; children: ReactNode; className?: string }) {
   return (
-    <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${TONES[tone]}`}>
+    <span className={`badge ${TONES[tone]} ${className}`}>
       {children}
     </span>
   );
@@ -37,60 +37,60 @@ const STATUS_TONES: Record<string, Tone> = {
   DENIED: "danger",
 };
 
-export function StatusBadge({ value }: { value: string }) {
-  return <Badge tone={STATUS_TONES[value] ?? "neutral"}>{value.replaceAll("_", " ")}</Badge>;
+export function StatusBadge({ value, className = "" }: { value: string; className?: string }) {
+  return <Badge tone={STATUS_TONES[value] ?? "neutral"} className={className}>{value.replaceAll("_", " ")}</Badge>;
 }
 
-export function Card({ title, description, actions, children }: {
-  title?: string; description?: string; actions?: ReactNode; children: ReactNode;
+export function Card({ title, description, actions, children, className = "" }: {
+  title?: string; description?: string; actions?: ReactNode; children: ReactNode; className?: string;
 }) {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white">
+    <section className={`card card-elevated ${className}`}>
       {(title || actions) && (
-        <header className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 px-4 py-3">
+        <header className="card-header flex flex-wrap items-start justify-between gap-3">
           <div>
-            {title && <h2 className="text-sm font-semibold text-slate-900">{title}</h2>}
-            {description && <p className="mt-0.5 text-xs text-slate-500">{description}</p>}
+            {title && <h2 className="card-title">{title}</h2>}
+            {description && <p className="card-description">{description}</p>}
           </div>
           {actions}
         </header>
       )}
-      <div className="p-4">{children}</div>
+      <div className="card-content">{children}</div>
     </section>
   );
 }
 
-export function Stat({ label, value, hint }: { label: string; value: ReactNode; hint?: string }) {
+export function Stat({ label, value, hint, className = "" }: { label: string; value: ReactNode; hint?: string; className?: string }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white px-4 py-3">
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold tabular-nums text-slate-900">{value}</p>
-      {hint && <p className="mt-0.5 text-xs text-slate-500">{hint}</p>}
+    <div className={`stat-card ${className}`}>
+      <p className="stat-label">{label}</p>
+      <p className="stat-value">{value}</p>
+      {hint && <p className="stat-hint">{hint}</p>}
     </div>
   );
 }
 
-export function PageHeader({ title, description, actions }: {
-  title: string; description?: string; actions?: ReactNode;
+export function PageHeader({ title, description, actions, className = "" }: {
+  title: string; description?: string; actions?: ReactNode; className?: string;
 }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-3">
+    <div className={`page-header ${className}`}>
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-slate-900">{title}</h1>
-        {description && <p className="mt-1 text-sm text-slate-600">{description}</p>}
+        <h1 className="page-title">{title}</h1>
+        {description && <p className="page-description">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
   );
 }
 
-export function EmptyState({ children }: { children: ReactNode }) {
-  return <p className="rounded border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">{children}</p>;
+export function EmptyState({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <p className={`empty-state ${className}`}>{children}</p>;
 }
 
 export function Th({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <th scope="col" className={`whitespace-nowrap px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 ${className}`}>
+    <th scope="col" className={`px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 ${className}`}>
       {children}
     </th>
   );
@@ -100,16 +100,16 @@ export function Td({ children, className = "", title }: { children: ReactNode; c
   return <td title={title} className={`px-3 py-2 align-middle ${className}`}>{children}</td>;
 }
 
-export function TableWrap({ children }: { children: ReactNode }) {
+export function TableWrap({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-      <table className="min-w-full divide-y divide-slate-200 text-sm">{children}</table>
+    <div className={`table-container ${className}`}>
+      <table className="table">{children}</table>
     </div>
   );
 }
 
-export function Pagination({ page, pageSize, total, basePath, params }: {
-  page: number; pageSize: number; total: number; basePath: string; params: Record<string, string | undefined>;
+export function Pagination({ page, pageSize, total, basePath, params, className = "" }: {
+  page: number; pageSize: number; total: number; basePath: string; params: Record<string, string | undefined>; className?: string;
 }) {
   const pages = Math.max(1, Math.ceil(total / pageSize));
   const link = (p: number) => {
@@ -119,14 +119,166 @@ export function Pagination({ page, pageSize, total, basePath, params }: {
     return `${basePath}?${search.toString()}`;
   };
   return (
-    <nav className="flex items-center justify-between text-sm text-slate-600" aria-label="Pagination">
-      <span>
+    <nav className={`flex items-center justify-between text-sm text-slate-600 ${className}`} aria-label="Pagination">
+      <span className="text-slate-500">
         Page {page} of {pages} · {total} record{total === 1 ? "" : "s"}
       </span>
       <div className="flex gap-2">
-        {page > 1 && <a className="rounded border border-slate-300 bg-white px-3 py-1 hover:bg-slate-50" href={link(page - 1)}>Previous</a>}
-        {page < pages && <a className="rounded border border-slate-300 bg-white px-3 py-1 hover:bg-slate-50" href={link(page + 1)}>Next</a>}
+        {page > 1 && <a className="btn btn-outline btn-sm" href={link(page - 1)}>Previous</a>}
+        {page < pages && <a className="btn btn-outline btn-sm" href={link(page + 1)}>Next</a>}
       </div>
     </nav>
   );
+}
+
+// Additional utility components
+export function Input({ label, error, hint, className = "", ...props }: React.InputHTMLAttributes<HTMLInputElement> & { label?: string; error?: string; hint?: string; className?: string }) {
+  const id = props.id ?? props.name;
+  return (
+    <div className="w-full">
+      {label && <label htmlFor={id} className="label">{label}</label>}
+      <input
+        {...props}
+        id={id}
+        className={`input ${error ? "border-rose-500 focus:ring-rose-500 focus:border-rose-500" : ""} ${className}`}
+        aria-invalid={error ? "true" : "false"}
+        aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
+      />
+      {error && <p id={`${id}-error`} className="mt-1 text-sm text-rose-600" role="alert">{error}</p>}
+      {hint && !error && <p id={`${id}-hint`} className="mt-1 text-xs text-slate-500">{hint}</p>}
+    </div>
+  );
+}
+
+export function Select({ label, error, hint, className = "", children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement> & { label?: string; error?: string; hint?: string; className?: string; children: ReactNode }) {
+  const id = props.id ?? props.name;
+  return (
+    <div className="w-full">
+      {label && <label htmlFor={id} className="label">{label}</label>}
+      <select
+        {...props}
+        id={id}
+        className={`input ${error ? "border-rose-500 focus:ring-rose-500 focus:border-rose-500" : ""} ${className}`}
+        aria-invalid={error ? "true" : "false"}
+        aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
+      >
+        {children}
+      </select>
+      {error && <p id={`${id}-error`} className="mt-1 text-sm text-rose-600" role="alert">{error}</p>}
+      {hint && !error && <p id={`${id}-hint`} className="mt-1 text-xs text-slate-500">{hint}</p>}
+    </div>
+  );
+}
+
+export function Button({ variant = "primary", size = "default", className = "", children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive"; size?: "default" | "sm" | "lg" }) {
+  const sizeClasses = {
+    default: "px-4 py-2 text-sm",
+    sm: "px-3 py-1.5 text-xs",
+    lg: "px-6 py-3 text-base",
+  };
+
+  const variantClasses = {
+    primary: "btn-primary",
+    secondary: "btn-secondary",
+    outline: "btn-outline",
+    ghost: "btn-ghost",
+    destructive: "btn-destructive",
+  };
+
+  return (
+    <button
+      {...props}
+      className={`btn ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function LinkButton({ variant = "primary", size = "default", className = "", children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive"; size?: "default" | "sm" | "lg" }) {
+  const sizeClasses = {
+    default: "px-4 py-2 text-sm",
+    sm: "px-3 py-1.5 text-xs",
+    lg: "px-6 py-3 text-base",
+  };
+
+  const variantClasses = {
+    primary: "btn-primary",
+    secondary: "btn-secondary",
+    outline: "btn-outline",
+    ghost: "btn-ghost",
+    destructive: "btn-destructive",
+  };
+
+  return (
+    <a
+      {...props}
+      className={`btn ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+    >
+      {children}
+    </a>
+  );
+}
+
+export function Alert({ variant = "info", children, className = "" }: { variant?: "info" | "success" | "warning" | "destructive"; children: ReactNode; className?: string }) {
+  const variantClasses = {
+    info: "alert-info",
+    success: "alert-success",
+    warning: "alert-warning",
+    destructive: "alert-destructive",
+  };
+
+  return (
+    <div className={`alert ${variantClasses[variant]} ${className}`} role="alert">
+      {children}
+    </div>
+  );
+}
+
+export function Divider({ className = "" }: { className?: string }) {
+  return <hr className={`divider ${className}`} />;
+}
+
+export function Skeleton({ className = "", style }: { className?: string; style?: React.CSSProperties }) {
+  return <div className={`skeleton ${className}`} style={style} />;
+}
+
+export function Tooltip({ children, content }: { children: ReactNode; content: string }) {
+  return (
+    <span className="tooltip" data-tooltip={content}>
+      {children}
+    </span>
+  );
+}
+
+export function NavLink({ active, className = "", children, ...props }: { active?: boolean; className?: string; children: ReactNode } & React.AnchorHTMLAttributes<HTMLAnchorElement>) {
+  return (
+    <a
+      {...props}
+      className={`nav-link ${active ? "active" : ""} ${className}`}
+    >
+      {children}
+    </a>
+  );
+}
+
+export function Dropdown({ children, menu, trigger }: { children: ReactNode; menu: ReactNode; trigger: ReactNode }) {
+  return (
+    <div className="dropdown relative inline-block">
+      <span>{trigger}</span>
+      <div className="dropdown-menu">{menu}</div>
+    </div>
+  );
+}
+
+export function DropdownItem({ children, className = "", ...props }: { children: ReactNode; className?: string } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button className={`dropdown-item ${className}`} {...props}>
+      {children}
+    </button>
+  );
+}
+
+export function DropdownDivider({ className = "" }: { className?: string }) {
+  return <hr className={`dropdown-divider ${className}`} />;
 }
