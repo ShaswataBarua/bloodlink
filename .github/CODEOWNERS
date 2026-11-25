@@ -1,0 +1,25 @@
+# Code Owners for BloodLink
+# These users will be automatically requested for review on PRs touching their areas
+
+# Global owners
+* @ShaswataBarua
+
+# Domain & business logic
+/src/domain/ @ShaswataBarua
+/src/services/ @ShaswataBarua
+
+# Security & auth
+/src/server/auth.ts @ShaswataBarua
+/src/server/policy.ts @ShaswataBarua
+/src/server/audit.ts @ShaswataBarua
+/src/server/session.ts @ShaswataBarua
+/src/server/guard.ts @ShaswataBarua
+
+# Database schema & migrations
+/drizzle/ @ShaswataBarua
+/src/db/ @ShaswataBarua
+
+# CI/CD & infrastructure
+/.github/workflows/ @ShaswataBarua
+/next.config.ts @ShaswataBarua
+/drizzle.config.ts @ShaswataBarua

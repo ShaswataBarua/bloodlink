@@ -1,10 +1,19 @@
 # BloodLink
 
+[![CI](https://github.com/ShaswataBarua/bloodlink/actions/workflows/ci.yml/badge.svg)](https://github.com/ShaswataBarua/bloodlink/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black.svg)](https://nextjs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
+[![Vitest](https://img.shields.io/badge/Tests-61%20passing-brightgreen.svg)](https://vitest.dev/)
+
 **Blood bank inventory and emergency allocation for Bangladesh.**
 Hack the Vibe 2026 (CODE-ARENAX) — Track: World Problem Solver.
 Declared advanced challenges: **A05 Concurrency & Transaction Management** and **A03 Advanced Security & Access Control**.
 
 Hospitals request blood, blood banks manage stock collected from donors, and the system allocates real units so the same unit can never be given to two patients. Everything runs against PostgreSQL; there is no mock data path.
+
+**Live demo**: [https://bloodlink.vercel.app](https://bloodlink.vercel.app) *(deploy after Vercel + Neon setup)*
 
 ---
 
@@ -255,3 +264,35 @@ For a fresh production demo, `npm run db:reset` drops and reseeds — it refuses
 - The Race Lab is a demonstration surface and is restricted to ADMIN/BANK_STAFF; it creates real requests and real allocations.
 - Blood units are modelled as red-cell concentrates (35-day shelf life); platelets/plasma are out of scope.
 - No email/SMS notifications — the product is an operations console, not a patient-facing service.
+
+---
+
+## 12. Project links
+
+| Link | Description |
+|------|-------------|
+| [GitHub Repository](https://github.com/ShaswataBarua/bloodlink) | Source code, issues, PRs |
+| [Live Demo](https://bloodlink.vercel.app) | Vercel deployment (after setup) |
+| [Contributing Guide](CONTRIBUTING.md) | Branching, commits, PR process |
+| [Changelog](CHANGELOG.md) | Version history |
+| [License](LICENSE) | MIT License |
+| [Code Owners](.github/CODEOWNERS) | Review assignments |
+
+---
+
+## 13. Hackathon submission checklist
+
+- [x] Public GitHub repo with README
+- [x] Live URL (deploy to Vercel)
+- [x] YouTube demo script (Section 9)
+- [x] Architecture documentation (Section 3)
+- [x] ER diagram (Section 3)
+- [x] Setup instructions (Section 8)
+- [x] Test accounts table (Section 8)
+- [x] How to run tests (Section 8)
+- [x] Viva Q&A notes (problem, workflow, A05 demo, A03 demo, edge case)
+
+---
+
+*Built for Hack the Vibe 2026 (CODE-ARENAX) — World Problem Solver track.*
+*Blood bank operations for Bangladesh. No AI, no fluff — just verified behavior.*
