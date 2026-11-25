@@ -13,7 +13,7 @@ Declared advanced challenges: **A05 Concurrency & Transaction Management** and *
 
 Hospitals request blood, blood banks manage stock collected from donors, and the system allocates real units so the same unit can never be given to two patients. Everything runs against PostgreSQL; there is no mock data path.
 
-**Live demo**: [https://bloodlink.vercel.app](https://bloodlink.vercel.app) *(deploy after Vercel + Neon setup)*
+**Live demo**: [https://bloodlink-opal-xi.vercel.app](https://bloodlink-opal-xi.vercel.app)
 
 ---
 
@@ -48,6 +48,108 @@ BloodLink makes the three workflows one system:
 
 ## 3. Architecture
 
+### System Overview
+
+```mermaid
+flowchart TD
+
+subgraph group_product["User workflows"]
+  node_app["Web application"]
+  node_api["API routes"]
+  node_request_ui["Request workflow UI<br/>[NewRequestForm.tsx]"]
+  node_donation_ui["Donation form<br/>[DonationForm.tsx]"]
+  node_race_ui["Race lab UI<br/>[RaceLab.tsx]"]
+  node_security_ui["Security lab UI<br/>[SecurityLab.tsx]"]
+end
+
+subgraph group_domain["Blood-bank domain"]
+  node_blood_rules["Blood-group rules<br/>[blood.ts]"]
+  node_eligibility["Donor eligibility<br/>[eligibility.ts]"]
+  node_compatibility["ABO/Rh compatibility<br/>[compatibility.ts]"]
+  node_request_state["Request state machine<br/>[request-state.ts]"]
+  node_validation["Shared validation<br/>[schemas.ts]"]
+end
+
+subgraph group_services["Business services"]
+  node_request_service["Request allocation<br/>[requests.ts]"]
+  node_donation_service["Donor and donation<br/>[donations.ts]"]
+  node_inventory_service["Inventory management<br/>[inventory.ts]"]
+  node_dashboard_service["Dashboard data<br/>[dashboard.ts]"]
+  node_race_service["Concurrency simulation<br/>[race.ts]"]
+  node_security_service["Security scenarios<br/>[security.ts]"]
+end
+
+subgraph group_platform["Platform and safeguards"]
+  node_database[("PostgreSQL database<br/>[schema.ts]")]
+  node_auth["Authentication and sessions<br/>[auth.ts]"]
+  node_guard["Authorization guard<br/>[guard.ts]"]
+  node_policy["Role and tenant policy<br/>[policy.ts]"]
+  node_audit["Append-only audit chain<br/>[audit.ts]"]
+  node_retry["Transaction retry<br/>[retry.ts]"]
+  node_query["List query parsing<br/>[query.ts]"]
+end
+
+node_hospital(("Hospital staff"))
+node_bank(("Blood-bank staff"))
+node_donor(("Donor"))
+
+node_hospital -->|"uses"| node_app
+node_bank -->|"uses"| node_app
+node_donor -->|"uses"| node_app
+node_app -.->|"presents"| node_request_ui
+node_request_ui -.->|"submits requests"| node_api
+node_donation_ui -.->|"submits donations"| node_api
+node_race_ui -->|"runs simulation"| node_api
+node_security_ui -.->|"runs scenarios"| node_api
+node_api -->|"delegates requests"| node_request_service
+node_api -->|"delegates donations"| node_donation_service
+node_api -->|"delegates inventory"| node_inventory_service
+node_api -->|"delegates simulation"| node_race_service
+node_api -->|"delegates scenarios"| node_security_service
+node_api -.->|"reads dashboard"| node_dashboard_service
+node_api -->|"authenticates users"| node_auth
+node_api -->|"checks access"| node_guard
+node_api -->|"parses filters"| node_query
+node_request_service -->|"selects compatible units"| node_compatibility
+node_request_service -->|"checks transitions"| node_request_state
+node_request_service -->|"retries transactions"| node_retry
+node_request_service -->|"reserves units"| node_database
+node_donation_service -->|"checks eligibility"| node_eligibility
+node_donation_service -->|"uses shelf life"| node_blood_rules
+node_donation_service -->|"processes waitlist"| node_request_service
+node_donation_service -->|"records donations"| node_database
+node_inventory_service -->|"reads and updates stock"| node_database
+node_race_service -->|"runs concurrent reservations"| node_request_service
+node_race_service -->|"resets test stock"| node_database
+node_security_service -->|"tests request controls"| node_request_service
+node_security_service -->|"tests security controls"| node_database
+node_auth -->|"checks donor eligibility"| node_eligibility
+node_auth -->|"stores sessions and users"| node_database
+node_guard -->|"authorizes actions"| node_policy
+node_guard -->|"records denials"| node_audit
+node_policy -->|"uses actor role"| node_auth
+node_request_service -->|"appends audit rows"| node_audit
+node_audit -->|"writes and verifies chain"| node_database
+node_validation -->|"validates blood groups"| node_blood_rules
+
+classDef toneNeutral fill:#f8fafc,stroke:#334155,stroke-width:1.5px,color:#0f172a
+classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+classDef toneIndigo fill:#e0e7ff,stroke:#4f46e5,stroke-width:1.5px,color:#312e81
+classDef toneTeal fill:#ccfbf1,stroke:#0f766e,stroke-width:1.5px,color:#134e4a
+class node_app,node_api,node_request_ui,node_donation_ui,node_race_ui,node_security_ui toneBlue
+class node_blood_rules,node_eligibility,node_compatibility,node_request_state,node_validation toneAmber
+class node_request_service,node_donation_service,node_inventory_service,node_dashboard_service,node_race_service,node_security_service toneMint
+class node_database,node_auth,node_guard,node_policy,node_audit,node_retry,node_query toneRose
+class node_hospital,node_bank,node_donor toneIndigo
+```
+
+> **Generated from codebase** — [View on gitdiagram.com](https://gitdiagram.com/shaswatabarua/bloodlink) | Each node links to source on GitHub
+
+### Repository Structure
+
 ```
 src/
   app/
@@ -70,7 +172,7 @@ tests/                     domain, policy, auth, allocation, concurrency, audit
 
 **Rule of thumb:** UI components never contain business rules. Routes authenticate, call the policy module, validate with zod, and delegate to a service. Services own transactions and write audit rows.
 
-### ER diagram
+### ER Diagram
 
 ```mermaid
 erDiagram
@@ -272,7 +374,8 @@ For a fresh production demo, `npm run db:reset` drops and reseeds — it refuses
 | Link | Description |
 |------|-------------|
 | [GitHub Repository](https://github.com/ShaswataBarua/bloodlink) | Source code, issues, PRs |
-| [Live Demo](https://bloodlink.vercel.app) | Vercel deployment (after setup) |
+| [Live Demo](https://bloodlink-opal-xi.vercel.app) | Vercel deployment |
+| [Architecture Diagram](https://gitdiagram.com/shaswatabarua/bloodlink) | Interactive system diagram |
 | [Contributing Guide](CONTRIBUTING.md) | Branching, commits, PR process |
 | [Changelog](CHANGELOG.md) | Version history |
 | [License](LICENSE) | MIT License |
